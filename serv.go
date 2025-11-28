@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -58,9 +60,33 @@ func receiveMetrics(w http.ResponseWriter, r *http.Request) { // traitement de l
 		http.Error(w, "JSON invalide", http.StatusBadRequest)
 		return
 	}
-	metricsStorage[m.IdAgent] = m // ajout au map de stockage des métriques
+	metricsStorage[m.IdAgent] = m // ajout de l'objet contenant les métriques au map de stockage des métriques
 	log.Println(metricsStorage)
 	log.Printf("[OK] Reçu : %+v\n", m)
-
 	w.WriteHeader(http.StatusOK)
+
+	// ajout de l'objet contenant les métriques au fichier d'historique json
+
+	filename := "history.json"
+	var dataJSONFile []Metrics
+
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			dataJSONFile = []Metrics{} // aucun contenu déjà existant dans le fichier json alors on ajoute aucun contenu à ce slice
+		} else {
+			panic(err)
+		}
+	} else {
+		json.Unmarshal(data, &dataJSONFile) // récupération dans la slice du contenu déjà existant dans le fichier json
+	}
+	dataJSONFile = append(dataJSONFile, m) // ajout de l'objet contenant les nouvelles métriques à la slice
+	file, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	encoder.Encode(dataJSONFile) // mise à jour du fichier avec l'ancien contenu + nouveau objet contenant les nouvelles métriques à partir de la slice
 }
