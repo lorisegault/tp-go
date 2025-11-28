@@ -27,8 +27,8 @@ Dans ce fichier on retrouve le contenu suivant :
 - Un import des packages
 - Un constructeur d'objets `Metrics`
 - Un map de stockage des objets `Metrics` qui contiendra les métriques reçus
-- Un endpoint `POST /RPC` qui lance l'enregistrement des métriques reçus dans le map de stockage et ajoute dans le fichier `json` d'historique les métriques
-- Un endpoint `GET /view` qui permet de renvoyer les objets `Metrics` enregistré dans le map de stockage
+- Un endpoint `POST /RPC` qui lance l'enregistrement des métriques reçus dans le map de stockage et ajoute les métriques dans le fichier `json` d'historique 
+- Un endpoint `GET /view` qui permet de renvoyer les objets `Metrics` enregistrés dans le map de stockage
 - Un serveur http lançé sur le port `8443`
 
 
